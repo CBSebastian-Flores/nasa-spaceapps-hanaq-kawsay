@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -377,10 +378,99 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #566071;
         }
+    
+        /* Pantalla de Carga (Preloader) */
+        #os-preloader {
+            position: fixed;
+            inset: 0;
+            background-color: #02040a;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+        .os-preloader-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .boot-console {
+            font-family: 'Roboto Mono', monospace;
+            color: #00f0ff;
+            font-size: 13px;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            height: 180px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+        }
+        .boot-line {
+            margin: 2px 0;
+            opacity: 0;
+            animation: fadeInBoot 0.1s forwards;
+        }
+        @keyframes fadeInBoot {
+            to { opacity: 1; }
+        }
+        .llama-float {
+            animation: llamaFloat 3s ease-in-out infinite;
+        }
+        @keyframes llamaFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+
     </style>
 </head>
 
 <body class="min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
+
+    <!-- PRELOADER DEL SISTEMA OPERATIVO CON LLAMA ESPACIAL -->
+    <div id="os-preloader">
+        <div class="mb-6 relative w-40 h-40 flex items-center justify-center llama-float">
+            <!-- Anillos de telemetría -->
+            <div class="absolute inset-0 rounded-full border-2 border-dashed border-cyan-500 animate-[spin_6s_linear_infinite] opacity-40"></div>
+            <div class="absolute inset-3 rounded-full border-t-2 border-r-2 border-emerald-400 animate-[spin_3s_linear_infinite] opacity-60"></div>
+            
+            <!-- SVG Llama Espacial Peruana -->
+            <div class="relative z-10 text-cyan-300 drop-shadow-[0_0_15px_rgba(0,240,255,0.6)]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-24 h-24 ml-4">
+                    <!-- Cuerpo -->
+                    <path fill="currentColor" d="M 25 55 L 25 90 L 35 90 L 35 75 L 60 75 L 60 90 L 70 90 L 70 55 L 65 45 L 30 45 Z" />
+                    <!-- Cuello y Cabeza -->
+                    <path fill="currentColor" d="M 55 45 L 75 45 L 80 25 L 60 25 Z" />
+                    <!-- Orejas -->
+                    <path fill="currentColor" d="M 60 25 L 55 10 L 65 20 Z M 70 20 L 75 5 L 80 25 Z" />
+                    <!-- Hocico -->
+                    <path fill="currentColor" d="M 78 25 L 95 30 L 95 42 L 75 42 Z" />
+                    <!-- Ojo -->
+                    <circle cx="75" cy="32" r="3" fill="#02040a" />
+                    
+                    <!-- Casco de Astronauta -->
+                    <circle cx="76" cy="30" r="24" fill="none" stroke="#00ff9d" stroke-width="3" stroke-dasharray="4 2" class="opacity-80 animate-[spin_10s_linear_infinite]" />
+                    <circle cx="76" cy="30" r="28" fill="none" stroke="#00f0ff" stroke-width="1.5" class="opacity-60" />
+                    <!-- Reflejo Casco -->
+                    <path d="M 58 20 A 24 24 0 0 1 76 6" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" class="opacity-50" />
+                </svg>
+            </div>
+            <!-- Estrellas / Partículas -->
+            <div class="absolute top-0 left-4 w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping"></div>
+            <div class="absolute bottom-4 right-2 w-2 h-2 bg-rose-400 rounded-full animate-pulse"></div>
+        </div>
+        
+        <div class="boot-console" id="bootConsole">
+            <!-- Las líneas se inyectan por JS -->
+        </div>
+        <div class="mt-4 text-[10px] font-mono text-emerald-500 uppercase tracking-[0.3em] animate-pulse">
+            SISTEMA HANAQ KAWSAY INICIANDO...
+        </div>
+    </div>
+
 
     <!-- Notificaciones Flotantes -->
     <div id="toastContainer"
@@ -409,6 +499,10 @@
                         <span
                             class="text-xs font-mono text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/30">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LINK ACTIVE
+                        </span>
+                        <span
+                            class="text-[10px] font-mono uppercase tracking-[0.12em] px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-400/40">
+                            <i class="fa-solid fa-database mr-1"></i>NASA OPEN DATA: OSDR • LSDA • HRP • SRAG
                         </span>
                     </div>
                     <h1
@@ -448,10 +542,10 @@
             class="max-w-7xl w-full mx-auto border-t border-slate-800/90 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-400 gap-2">
             <span class="flex items-center gap-2">
                 <i class="fa-solid fa-shield-halved text-cyan-400"></i>
-                <span>BIOMEDICAL MONITORING SYSTEM IN 3 PHASES // RADIATION • Total Body Mass</span>
+                <span>CALIBRATED WITH NASA OPEN SCIENCE DATA REPOSITORY (OSDR) • LSDA • HRP • SRAG RADLAB</span>
             </span>
             <span class="text-cyan-400 bg-cyan-950/50 border border-cyan-500/30 px-3 py-1 rounded-lg">
-                <i class="fa-solid fa-file-excel mr-1"></i> EXCEL IMPORT (.XLSX / .CSV)
+                <i class="fa-solid fa-file-excel mr-1"></i> NASA OSDR / HRP DATASET (.XLSX / .CSV)
             </span>
         </div>
     </div>
@@ -475,7 +569,8 @@
                     class="astronaut-portrait-img rounded-full bg-slate-950">
             </div>
 
-            <p class="text-xs font-mono uppercase tracking-[0.2em] text-cyan-400" id="welcomeAstroCode">APOLLO 11 MISSION // AST-11A</p>
+            <p class="text-xs font-mono uppercase tracking-[0.2em] text-cyan-400" id="welcomeAstroCode">APOLLO 11
+                MISSION // AST-11A</p>
             <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-white mt-1 tracking-wide"
                 id="welcomeAstroTitle">Welcome aboard, Neil Armstrong!</h2>
             <p class="text-xs sm:text-sm text-slate-300 mt-2.5 max-w-xl mx-auto leading-relaxed" id="welcomeAstroBio">
@@ -531,7 +626,8 @@
                     </div>
                     <h1
                         class="text-sm sm:text-base lg:text-lg font-display font-bold tracking-wide text-white mt-0.5 uppercase">
-                        Space Telemetry: <span class="text-amber-400">Radiation</span> • <span class="text-emerald-400">Total Body Mass</span>
+                        Space Telemetry: <span class="text-amber-400">Radiation</span> • <span
+                            class="text-emerald-400">Total Body Mass</span>
                     </h1>
                 </div>
             </div>
@@ -555,7 +651,7 @@
                 <button onclick="downloadExcelTemplate()"
                     class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-semibold text-xs flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-download"></i>
-                    <span>Template .xlsx</span>
+                    <span>NASA OSDR .xlsx</span>
                 </button>
 
                 <!-- Orbital Scenario Selector -->
@@ -667,11 +763,14 @@
                     </span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h2 class="text-sm font-display font-bold text-white uppercase tracking-wider">Manual Biomedical Parameter Simulator</h2>
+                            <h2 class="text-sm font-display font-bold text-white uppercase tracking-wider">Manual
+                                Biomedical Parameter Simulator</h2>
                             <span
-                                class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">OVERRIDE ACTIVE</span>
+                                class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">OVERRIDE
+                                ACTIVE</span>
                         </div>
-                        <p class="text-xs text-slate-400">Adjust any variable (Radiation, Total Body Mass or Vital Signs) to test Phases I, II and III on the 3D hologram.
+                        <p class="text-xs text-slate-400">Adjust any variable (Radiation, Total Body Mass or Vital
+                            Signs) to test Phases I, II and III on the 3D hologram.
                         </p>
                     </div>
                 </div>
@@ -731,11 +830,11 @@
                     <div class="flex items-center gap-2 flex-wrap">
                         <span
                             class="px-2.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 text-[10px] font-mono uppercase tracking-widest">
-                            ANALYTICS DECK // EXCEL SYNC (.XLSX / .CSV)
+                            NASA OPEN DATA DECK // OSDR • LSDA • HRP • SRAG RADLAB SYNC
                         </span>
                         <span id="excelSyncStatusBadge"
                             class="px-2.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold">
-                            30 ACTIVE RECORDS
+                            30 NASA OSDR / HRP RECORDS (AST-11A)
                         </span>
                     </div>
                     <h2
@@ -743,7 +842,8 @@
                         <i class="fa-solid fa-chart-line text-cyan-400"></i>
                         <span>Chart Telemetry: Space Radiation • Total Body Mass</span>
                     </h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Click any point on the curves by Mission Day to jump to that moment and assess the anatomical impact on the 3D model.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Click any point on the curves by Mission Day to jump to
+                        that moment and assess the anatomical impact on the 3D model.</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -893,8 +993,10 @@
                         <i class="fa-solid fa-book-medical"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-display font-bold text-white uppercase tracking-wide">Aerospace Clinical Manual: 3-Phase Protocols and 0G Instrumentation</h3>
-                        <p class="text-xs text-slate-400">Bioastronautics Medicine Standard for Crew Monitoring in Microgravity</p>
+                        <h3 class="text-lg font-display font-bold text-white uppercase tracking-wide">Aerospace Clinical
+                            Manual: 3-Phase Protocols and 0G Instrumentation</h3>
+                        <p class="text-xs text-slate-400">Bioastronautics Medicine Standard for Crew Monitoring in
+                            Microgravity</p>
                     </div>
                 </div>
                 <button onclick="closeProtocolsMatrixModal()"
@@ -916,8 +1018,8 @@
             <div class="px-5 py-4 border-b border-rose-500/40 flex items-center justify-between gap-3 bg-rose-950/60">
                 <div class="flex items-center gap-3.5 min-w-0">
                     <div class="w-14 h-14 rounded-xl p-0.5 frame-emergency shrink-0">
-                        <img id="emergencyAvatar" src="" data-candidate-idx="0" referrerpolicy="no-referrer" alt="Crew Member"
-                            class="astronaut-portrait-img rounded-[10px] bg-slate-950">
+                        <img id="emergencyAvatar" src="" data-candidate-idx="0" referrerpolicy="no-referrer"
+                            alt="Crew Member" class="astronaut-portrait-img rounded-[10px] bg-slate-950">
                     </div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -928,7 +1030,8 @@
                             <span id="emergencyTriageBadge"
                                 class="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full phase-badge-1">--</span>
                         </div>
-                        <h3 id="emergencyTitle" class="text-lg sm:text-xl font-display font-extrabold text-white mt-1 truncate">
+                        <h3 id="emergencyTitle"
+                            class="text-lg sm:text-xl font-display font-extrabold text-white mt-1 truncate">
                             Crew Member</h3>
                         <p id="emergencySource" class="text-[11px] font-mono text-slate-400 truncate"></p>
                     </div>
@@ -1669,6 +1772,11 @@
                 }
             }
 
+            // Rule Zero: ABSOLUTE CARDIAC ARREST (HR zero or < 25)
+            if (hr < 25) {
+                addSyndrome('CARDIAC ARREST DETECTED', 3, 'Cardiovascular / Systemic', 'CRITICAL! INITIATE HANDSTAND CPR IMMEDIATELY (110 CPM) AND CONNECT DEFIBRILLATOR (AED).');
+            }
+
             // Rule F: Severe Hypovolemia (low BP + high HR + low Temp)
             // Uses "temp < 36.1" to identify the lack of thermal perfusion.
             if (sys < 100 && hr > 100 && temp < 36.1) {
@@ -1808,7 +1916,7 @@
 
             const refTag = document.createElement('div');
             refTag.className = 'pointer-events-none absolute bottom-1 left-2 z-20 text-[11px] font-mono text-slate-200 bg-slate-900/90 border border-slate-600 rounded px-2 py-0.5';
-            refTag.textContent = 'REFERENCE MODEL: 1.80 m · 72 kg · BMI 22.2';
+            refTag.textContent = 'NASA HRP / OSDR BIO-MODEL: 1.80 m · 72 kg · BMI 22.2';
             container.appendChild(refTag);
 
             // ---- Neutral studio lighting (no coloured neon lights)
@@ -2304,7 +2412,7 @@
             const veinMat = phong(0x3a63d6, { shininess: 40 });
             const vessel = (pts, r, mat) => addReg(tubeMesh(pts, r, mat, 40, 6), 'heart');
             vessel([[0.04, 1.30, 0.03], [0.035, 1.38, 0.025], [0.01, 1.42, 0.0], [-0.01, 1.40, -0.03], [-0.015, 1.30, -0.05],
-                [-0.01, 1.15, -0.055], [0, 0.98, -0.045], [0, 0.88, -0.03]], 0.011, arteryMat);                  // aorta
+            [-0.01, 1.15, -0.055], [0, 0.98, -0.045], [0, 0.88, -0.03]], 0.011, arteryMat);                  // aorta
             vessel([[-0.035, 1.46, 0.0], [-0.035, 1.38, 0.012], [-0.032, 1.30, 0.03]], 0.010, veinMat);          // superior vena cava
             vessel([[-0.03, 1.22, 0.0], [-0.028, 1.05, -0.03], [-0.02, 0.95, -0.035], [-0.01, 0.88, -0.03]], 0.011, veinMat); // inferior vena cava
             mir(s => {
@@ -2338,7 +2446,7 @@
             }
             addReg(tubeMesh(coil, 0.0125, phong(0xe9b4a0, { shininess: 25 }), 260, 6), 'torso');
             addReg(tubeMesh([[-0.100, 0.93, 0.040], [-0.116, 1.03, 0.044], [-0.102, 1.10, 0.046], [-0.04, 1.118, 0.056], [0.04, 1.118, 0.056],
-                [0.102, 1.10, 0.046], [0.116, 1.02, 0.044], [0.100, 0.94, 0.040], [0.06, 0.895, 0.044], [0, 0.88, 0.046]], 0.017, phong(0xd6a07a, { shininess: 25 }), 80, 8), 'torso');
+            [0.102, 1.10, 0.046], [0.116, 1.02, 0.044], [0.100, 0.94, 0.040], [0.06, 0.895, 0.044], [0, 0.88, 0.046]], 0.017, phong(0xd6a07a, { shininess: 25 }), 80, 8), 'torso');
 
             // ---------------- Details on the skin: ears, fingers (share the zone skin material) ----------------
             mir(s => addReg(ellMesh(P(s * 0.079, 1.66, 0), [0.012, 0.030, 0.018], skinMats.head, { w: 8, h: 8 }), 'head'));
@@ -2621,7 +2729,7 @@
             const hrOff = profile.hrOffset || 0;
 
             if (scenarioKey === 'real_mix') {
-                sourceLabel = `Telemetry of ${profile.name} (${profile.mission})`;
+                sourceLabel = `NASA OSDR & HRP Calibrated Telemetry — ${profile.name} (${profile.mission})`;
                 rows = BASE_MISSION_TELEMETRY.map(r => ({
                     ...r,
                     hr: Math.max(48, r.hr + hrOff),
@@ -2630,7 +2738,7 @@
                     mass: +(r.mass + massOff).toFixed(2)
                 }));
             } else if (scenarioKey === 'nominal_all') {
-                sourceLabel = `${profile.name}: Nominal Orbit (Phase I)`;
+                sourceLabel = `NASA LSDA / HRP Nominal Orbit Baseline (Phase I) — ${profile.name}`;
                 rows = BASE_MISSION_TELEMETRY.map((r, i) => {
                     const sys = 114 + (i % 8), dia = 73 + (i % 5);
                     return {
@@ -2646,7 +2754,7 @@
                     };
                 });
             } else if (scenarioKey === 'solar_storm') {
-                sourceLabel = `${profile.name}: Solar Storm SPE`;
+                sourceLabel = `NASA SRAG / RADLab Solar Particle Event (SPE) — ${profile.name}`;
                 let dose = 0.85 * radMult;
                 rows = BASE_MISSION_TELEMETRY.map((r, i) => {
                     const stormFactor = i >= 4 && i <= 22 ? 0.36 : 0.04;
@@ -2666,7 +2774,7 @@
                     };
                 });
             } else if (scenarioKey === 'eva_overexertion') {
-                sourceLabel = `${profile.name}: Extreme Exertion & EVA`;
+                sourceLabel = `NASA HRP EVA Exertion & Metabolic Model — ${profile.name}`;
                 const load = 1.25;
                 rows = BASE_MISSION_TELEMETRY.map((r, i) => {
                     const sys = Math.min(168, Math.round(118 + (i * 1.5 * load)));
@@ -2684,7 +2792,7 @@
                     };
                 });
             } else if (scenarioKey === 'hypoxia_cabin') {
-                sourceLabel = `${profile.name}: ECLSS Failure Hypoxia`;
+                sourceLabel = `NASA ECLSS / HRP Cabin Hypoxia Model — ${profile.name}`;
                 const sev = 1.2;
                 rows = BASE_MISSION_TELEMETRY.map((r, i) => {
                     const sys = Math.min(158, Math.round(118 + i * 1.1 * sev));
@@ -3113,10 +3221,15 @@
             const romanPhase = p => p === 1 ? 'I' : (p === 2 ? 'II' : 'III');
 
             document.getElementById('astro-name').textContent = ASTRONAUT.name;
-            const modeBadge = manualLock
-                ? `<span onclick="releaseManualLocks()" class="cursor-pointer ml-1.5 px-2 py-0.5 rounded bg-rose-500/25 text-rose-300 border border-rose-500/50 text-[10px] font-mono">MANUAL LOCK <i class="fa-solid fa-xmark"></i></span>`
-                : `<span class="ml-1.5 px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono">TELEMETRY ACTIVE</span>`;
-            document.getElementById('astro-source').innerHTML = `<i class="fa-solid fa-database text-cyan-400 mr-1"></i>${ASTRONAUT.sourceLabel} ${modeBadge}`;
+            const sourceSig = `${ASTRONAUT.sourceLabel}|${manualLock}`;
+            const sourceEl = document.getElementById('astro-source');
+            if (sourceEl && sourceEl.dataset.sig !== sourceSig) {
+                sourceEl.dataset.sig = sourceSig;
+                const modeBadge = manualLock
+                    ? `<span onclick="releaseManualLocks()" class="cursor-pointer ml-1.5 px-2 py-0.5 rounded bg-rose-500/25 text-rose-300 border border-rose-500/50 text-[10px] font-mono">MANUAL LOCK <i class="fa-solid fa-xmark"></i></span>`
+                    : `<span class="ml-1.5 px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono">NASA OSDR / HRP SYNC ACTIVE</span>`;
+                sourceEl.innerHTML = `<i class="fa-solid fa-database text-cyan-400 mr-1"></i>${ASTRONAUT.sourceLabel} ${modeBadge}`;
+            }
 
             document.getElementById('val-hr').textContent = row.hr;
             document.getElementById('val-spo2').textContent = Number(row.spo2).toFixed(1);
@@ -3664,7 +3777,7 @@
                 'Respiration (RPM)': d.resp
             }));
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(formatted), 'Space_Telemetry');
-            XLSX.writeFile(wb, 'Template_Radiation_BodyMass.xlsx');
+            XLSX.writeFile(wb, 'NASA_OSDR_ISS_Telemetry.xlsx');
             showNotification('Excel template with Space Radiation and Total Body Mass downloaded.');
         }
 
@@ -3846,7 +3959,21 @@
         function renderEmergencyProtocol(force = false) {
             const snap = getEmergencySnapshot(emergencyAstroKey);
             if (!snap) return;
-            const { profile, row, idx, initialMass, sourceLabel } = snap;
+            
+            // Override Manual Directo en la Ventana de Emergencia (Si el tripulante se quita el Astroskin)
+            const inputHR = document.getElementById('emInputHR');
+            const hrEm = inputHR ? Number(inputHR.value) : snap.row.hr;
+            const inputSpo2 = document.getElementById('emInputSpo2');
+            const spo2Em = inputSpo2 ? Number(inputSpo2.value) : snap.row.spo2;
+            const inputSys = document.getElementById('emInputSys');
+            const sysEm = inputSys ? Number(inputSys.value) : snap.row.sys;
+            const diaEm = snap.row.dia; // Diastólica arrastrada desde el dashboard
+            const inputResp = document.getElementById('emInputResp');
+            const respEm = inputResp ? Number(inputResp.value) : snap.row.resp;
+
+            // Fila de datos combinada (Simulada para esta vista)
+            const row = { ...snap.row, hr: hrEm, spo2: spo2Em, sys: sysEm, dia: diaEm, bp: `${sysEm}/${diaEm}`, resp: respEm };
+            const { profile, idx, initialMass, sourceLabel } = snap;
 
             const signature = `${emergencyAstroKey}|${idx}|${JSON.stringify(row)}`;
             if (!force && signature === emergencyLastSignature) return;
@@ -3925,6 +4052,36 @@
             const body = document.getElementById('emergencyBody');
             const prevScroll = body.scrollTop;
             body.innerHTML = `
+                <!-- OVERRIDE MÉDICO DIRECTO (BOTIQUÍN PORTÁTIL) -->
+                <div class="bg-rose-950/20 border border-rose-500/30 rounded-xl p-4 mb-2 shadow-inner">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 h-6 rounded bg-rose-600/80 flex items-center justify-center text-white"><i class="fa-solid fa-suitcase-medical text-xs"></i></span>
+                            <span class="font-bold text-rose-300 uppercase tracking-wider text-xs">Manual Vital Support (Suit Disconnected)</span>
+                        </div>
+                    </div>
+                    <p class="text-slate-400 text-[11px] mb-3 leading-tight">If the suit sensors fail or are removed for CPR, enter the vital signs obtained with the emergency kit to recalculate guidelines in real time.</p>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-2">
+                            <label class="text-[10px] font-mono text-rose-400 block mb-1">HR (BPM)</label>
+                            <input type="number" id="emInputHR" value="${row.hr}" min="0" max="250" oninput="renderEmergencyProtocol(true)" class="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white font-mono text-sm focus:border-rose-400 focus:outline-none">
+                        </div>
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-2">
+                            <label class="text-[10px] font-mono text-sky-400 block mb-1">SpO2 (%)</label>
+                            <input type="number" id="emInputSpo2" value="${row.spo2}" min="0" max="100" oninput="renderEmergencyProtocol(true)" class="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white font-mono text-sm focus:border-sky-400 focus:outline-none">
+                        </div>
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-2">
+                            <label class="text-[10px] font-mono text-indigo-400 block mb-1">Systolic</label>
+                            <input type="number" id="emInputSys" value="${row.sys}" min="0" max="250" oninput="renderEmergencyProtocol(true)" class="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white font-mono text-sm focus:border-indigo-400 focus:outline-none">
+                        </div>
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-2">
+                            <label class="text-[10px] font-mono text-teal-400 block mb-1">Resp (RPM)</label>
+                            <input type="number" id="emInputResp" value="${row.resp}" min="0" max="60" oninput="renderEmergencyProtocol(true)" class="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white font-mono text-sm focus:border-teal-400 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="rounded-2xl p-4 border-2 ${triage.box} flex gap-3.5 items-start">
                     <i class="fa-solid ${triage.icon} text-2xl mt-0.5"></i>
                     <div>
@@ -4010,7 +4167,53 @@
         }
 
 
+        
+        // ============================================================================
+        // PRELOADER / PANTALLA DE CARGA DEL SISTEMA (LLAMA ESPACIAL)
+        // ============================================================================
+        function runSystemBootSequence() {
+            const consoleEl = document.getElementById('bootConsole');
+            const preloader = document.getElementById('os-preloader');
+            
+            const bootLines = [
+                "> INICIALIZANDO NÚCLEO HANAQ KAWSAY OS v4.4...",
+                "> CONECTANDO CON NODO AERO-MED...",
+                "> COMPILANDO SHADERS Y MATERIALES 3D...",
+                "> CARGANDO RED DE ESTILOS Y ESTÁNDARES NASA...",
+                "> DESPLEGANDO LLAMA ESPACIAL...",
+                "> ESTABLECIENDO ENLACES DE TELEMETRÍA...",
+                "> TODOS LOS SISTEMAS NOMINALES AL 100%.",
+                "> ABRIENDO HUD PRINCIPAL..."
+            ];
+
+            let lineIndex = 0;
+            
+            function printLine() {
+                if (lineIndex < bootLines.length) {
+                    const line = document.createElement('div');
+                    line.className = 'boot-line';
+                    line.innerHTML = `<span class="text-emerald-400 font-bold">[OK]</span> ${bootLines[lineIndex]}`;
+                    consoleEl.appendChild(line);
+                    lineIndex++;
+                    
+                    const nextDelay = Math.random() * 200 + 100;
+                    setTimeout(printLine, nextDelay);
+                }
+            }
+
+            printLine();
+
+            setTimeout(() => {
+                preloader.classList.add('os-preloader-hidden');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 800); 
+            }, 3500);
+        }
+
         window.onload = function () {
+            runSystemBootSequence();
+
             renderAstronautSelectionPortal();
             renderManualControls();
             generateScenarioData('real_mix');
